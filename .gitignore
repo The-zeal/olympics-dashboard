@@ -1,0 +1,4 @@
+.env
+olympics_env/
+__pycache__/
+*.pyc
