@@ -10,19 +10,19 @@ from urllib.parse import quote_plus
 load_dotenv(Path(__file__).parent.parent / ".env")
 
 def get_engine():
-    url = URL.create(
-        drivername="postgresql+psycopg2",
-        username=st.secrets["DB_USER"],
-        password=st.secrets["DB_PASSWORD"],  # no quote_plus needed
-        host=st.secrets["DB_HOST"],
-        port=st.secrets["DB_PORT"],
-        database=st.secrets["DB_NAME"],
-    )
+    user = os.getenv("DB_USER")
+    password = quote_plus(st.secrets["DB_PASSWORD"])
+    host = os.getenv("DB_HOST")
+    port = os.getenv("DB_PORT")
+    database = os.getenv("DB_NAME")
+    sslmode = os.getenv("DB_SSLMODE", "require")
 
-    return create_engine(
-        url,
-        connect_args={"sslmode": "require"}
+    connection_url = (
+        f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}"
+        f"?sslmode={sslmode}"
     )
+    engine = create_engine(connection_url)
+    return engine
 
 def load_table(schema, table_name):
     engine = get_engine()
